@@ -56,29 +56,35 @@ int main()
         }
     }
 
-    if (my_rank != 0)
+    double prefixlocalbais = localPrexfixSums[n / comm_sz - 1];
+
+    MPI_Scan(&prefixlocalbais, &bais, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    bais -= prefixlocalbais;
+
+    for (int i = 0; i < n / comm_sz; i++)
     {
-        MPI_Recv(&bais, 1, MPI_DOUBLE, my_rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        for (int i = 0; i < n / comm_sz; i++)
-            localPrexfixSums[i] += bais;
+
+        localPrexfixSums[i] += bais;
     }
 
-    if (my_rank != comm_sz - 1)
-    {
-        MPI_Send(&localPrexfixSums[n / comm_sz - 1], 1, MPI_DOUBLE, my_rank + 1, 0, MPI_COMM_WORLD);
-    }
-
-    MPI_Allgather(localPrexfixSums, n / comm_sz, MPI_DOUBLE, prefixSums, n / comm_sz, MPI_DOUBLE, MPI_COMM_WORLD);
+    MPI_Gather(localPrexfixSums, n / comm_sz, MPI_DOUBLE, prefixSums, n / comm_sz, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     if (my_rank == 0)
     {
         printf("The result of prefix sums is: ");
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < n; i++)
         {
-            printf("%lf ", vector[i]);
+            printf("%lf ", prefixSums[i]);
         }
         printf("\n");
     }
+
+    MPI_Finalize();
+    free(vector);
+    free(prefixSums);
+    free(localVector);
+    free(localPrexfixSums);
 
     return 0;
 }

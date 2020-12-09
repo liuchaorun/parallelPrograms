@@ -89,6 +89,7 @@ int main() {
     for (int i = 0; i < n/comm_sz; i++) {
         local_result[i] = local_vector2[i] * scalar;
     }
+    
     MPI_Gather(local_result, n / comm_sz, MPI_DOUBLE, result, n / comm_sz, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     if (my_rank == 0) {
         printf("The result of the second vector by a scalar is: ");

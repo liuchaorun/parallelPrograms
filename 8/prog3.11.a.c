@@ -20,8 +20,8 @@ int main() {
     }
 
     printf("The result of prefix sums is: ");
-    for (int i = 0; i < 0; i++) {
-        printf("%lf ", vector[i]);
+    for (int i = 0; i < n; i++) {
+        printf("%lf ", prefixSums[i]);
     }
     printf("\n");
 
