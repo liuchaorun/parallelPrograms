@@ -56,20 +56,23 @@ int main()
         }
     }
 
-    if (my_rank != 0)
+    unsigned bitMask = 1;
+    while (bitMask < comm_sz)
     {
-        MPI_Sendrecv();
-        MPI_Recv(&bais, 1, MPI_DOUBLE, my_rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        for (int i = 0; i < n / comm_sz; i++)
-            localPrexfixSums[i] += bais;
+        int p = my_rank ^ bitMask;
+        MPI_Sendrecv(&localPrexfixSums[n / comm_sz - 1], 1, MPI_DOUBLE, p, 0, &bais, 1, MPI_DOUBLE, p, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (my_rank > p)
+        {
+            for (int i = 0; i < n / comm_sz; i++)
+            {
+
+                localPrexfixSums[i] += bais;
+            }
+        }
+        bitMask <<= 1;
     }
 
-    if (my_rank != comm_sz - 1)
-    {
-        MPI_Send(&localPrexfixSums[n / comm_sz - 1], 1, MPI_DOUBLE, my_rank + 1, 0, MPI_COMM_WORLD);
-    }
-
-    MPI_Allgather(localPrexfixSums, n / comm_sz, MPI_DOUBLE, prefixSums, n / comm_sz, MPI_DOUBLE, MPI_COMM_WORLD);
+    MPI_gather(localPrexfixSums, n / comm_sz, MPI_DOUBLE, prefixSums, n / comm_sz, MPI_DOUBLE, MPI_COMM_WORLD);
 
     if (my_rank == 0)
     {
