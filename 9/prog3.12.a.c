@@ -74,7 +74,7 @@ int main()
     }
 
     MPI_Finalize();
-    free(num);
+    free(nums);
 
     return 0;
 }
