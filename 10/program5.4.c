@@ -17,10 +17,11 @@ int main(int agrc, char* argv[]) {
     }
 
     start = omp_get_wtime();
-    for (int phase = 0; phase < n; phase++) {
+    int phase, i;
+    for (phase = 0; phase < n; phase++) {
         if (phase % 2 == 0) {
-            #pragma omp parallel for num_treads(thread_count) default(none) shared(array, n) private(temp, i)
-            for (int i = 1; i < n; i+=2) {
+#pragma omp parallel for num_threads(thread_count) default(none) shared(array, n) private(temp, i)
+            for (i = 1; i < n; i+=2) {
                 if (array[i - 1] > array[i]) {
                     temp = array[i - 1];
                     array[i - 1] = array[i];
@@ -28,8 +29,8 @@ int main(int agrc, char* argv[]) {
                 }
             }
         } else {
-            #pragma omp parallel for num_treads(thread_count) default(none) shared(array, n) private(temp, i)
-            for (int i = 1; i < n; i+=2) {
+#pragma omp parallel for num_threads(thread_count) default(none) shared(array, n) private(temp, i)
+            for (i = 1; i < n; i+=2) {
                 if (array[i] > array[i + 1]) {
                     temp = array[i + 1];
                     array[i + 1] = array[i];

@@ -1,6 +1,14 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <omp.h>
-#include <stdlib.h>
+
+double f(double x) {
+   double return_val;
+
+   return_val = x*x;
+   return return_val;
+}
 
 void Trap(double a, double b, int n, double* global_result_p);
 
@@ -34,9 +42,9 @@ void Trap(double a, double b, int n, double* global_result_p) {
     h = (b - a) / n;
     local_n = n / thread_count;
     local_a = a + my_rank * local_n * h;
-    local_n = local_a + local_n * h;
+    local_b = local_a + local_n * h;
     my_result = (f(local_a) + f(local_b)) / 2.0;
-    for (int i = 1; i < local_n; i++) {
+    for (i = 1; i < local_n; i++) {
         x = local_a + i * h;
         my_result += f(x);
     }
